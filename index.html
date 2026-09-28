@@ -4,8 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2B3B2F">
-<title>Meu Dinheiro na Roça</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dinheiro na Roça">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>Meu Dinheiro na Roça</title>
 <style>
   :root{
     --bg: #F7F2E4;
@@ -108,6 +114,7 @@
 
   /* Chips de categoria */
   .chips{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+  .chip-item{position:relative;}
   .chip{
     border:2px solid var(--linha);
     background:var(--bg-card);
@@ -119,9 +126,39 @@
     display:flex;flex-direction:column;align-items:center;gap:6px;
     min-height:76px;
     color:var(--ink);
+    width:100%;
   }
   .chip .icone{font-size:1.5em;}
   .chip.selecionado{border-color:var(--sel-cor, var(--verde));background:var(--sel-bg, #EAF3EA);}
+  .chip-novo{border-style:dashed;color:var(--ink-soft);}
+  .remover-cat{
+    position:absolute;top:4px;right:4px;
+    width:26px;height:26px;border-radius:8px;
+    border:1.5px solid var(--linha);background:var(--bg-card);
+    color:var(--terra-escuro);font-size:0.85em;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .remover-cat:active{background:var(--linha);}
+
+  /* Form nova categoria */
+  .form-cat{
+    display:none;
+    background:var(--bg-card);border:1.5px solid var(--ouro);border-radius:14px;
+    padding:14px;margin-bottom:20px;
+  }
+  .form-cat.mostrar{display:block;}
+  .form-cat .linha{display:flex;gap:8px;margin-bottom:10px;}
+  .form-cat input{
+    flex:1;border:1.5px solid var(--linha);border-radius:10px;padding:12px;font-size:1em;
+    background:var(--bg);color:var(--ink);min-width:0;
+  }
+  .form-cat input.emoji{width:64px;flex:none;text-align:center;}
+  .form-cat .botoes{display:flex;gap:8px;}
+  .form-cat .botoes button{
+    flex:1;border:none;border-radius:10px;padding:12px;font-weight:700;font-size:0.95em;
+  }
+  .btn-cat-salvar{background:var(--verde-escuro);color:#fff;}
+  .btn-cat-cancelar{background:var(--linha);color:var(--ink);}
 
   /* Valor + teclado próprio */
   .valor-caixa{
@@ -144,10 +181,14 @@
 
   .campo{margin-bottom:16px;}
   .campo label{display:block;font-size:0.85em;font-weight:600;color:var(--ink-soft);margin-bottom:6px;}
+  .campo input[type="date"]{
+    width:100%;border:1.5px solid var(--linha);border-radius:12px;padding:14px;font-size:1em;
+    background:var(--bg-card);color:var(--ink);
+  }
   .campo-com-mic{display:flex;gap:8px;}
   .campo-com-mic input{
     flex:1;border:1.5px solid var(--linha);border-radius:12px;padding:14px;font-size:1em;
-    background:var(--bg-card);color:var(--ink);
+    background:var(--bg-card);color:var(--ink);min-width:0;
   }
   .btn-mic{
     width:52px;flex-shrink:0;border-radius:12px;border:1.5px solid var(--linha);
@@ -184,8 +225,10 @@
   .item{
     display:flex;align-items:center;gap:12px;background:var(--bg-card);
     border:1.5px solid var(--linha);border-radius:14px;padding:12px 14px;margin-bottom:8px;
+    width:100%;text-align:left;
   }
-  .item .icone{font-size:1.4em;width:34px;text-align:center;}
+  .item:active{background:#FBF7EC;}
+  .item .icone{font-size:1.4em;width:34px;text-align:center;flex-shrink:0;}
   .item .info{flex:1;min-width:0;}
   .item .cat{font-weight:700;font-size:0.95em;}
   .item .obs{font-size:0.82em;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -209,6 +252,24 @@
     display:flex;align-items:center;justify-content:center;gap:8px;
   }
 
+  /* Ajustes / backup */
+  .secao-ajustes{margin-bottom:24px;}
+  .secao-ajustes h3{
+    font-size:0.85em;font-weight:700;color:var(--ink-soft);text-transform:uppercase;
+    letter-spacing:0.06em;margin:0 0 10px;
+  }
+  .btn-ajuste{
+    width:100%;background:var(--bg-card);border:1.5px solid var(--linha);border-radius:14px;
+    padding:16px;font-size:1em;font-weight:600;color:var(--ink);
+    display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;text-align:left;
+  }
+  .btn-ajuste .seta{color:var(--ink-soft);}
+  .nota{
+    font-size:0.82em;color:var(--ink-soft);line-height:1.5;
+    background:var(--bg-card);border:1.5px solid var(--linha);border-radius:12px;
+    padding:12px 14px;margin-bottom:16px;
+  }
+
   .aviso-offline{
     display:none;
     background:var(--ouro);color:#3A2C05;font-weight:700;font-size:0.82em;
@@ -220,7 +281,7 @@
     position:fixed;left:50%;bottom:30px;transform:translateX(-50%);
     background:var(--verde-escuro);color:#fff;padding:12px 20px;border-radius:30px;
     font-weight:700;font-size:0.9em;z-index:40;opacity:0;pointer-events:none;
-    transition:opacity .25s;
+    transition:opacity .25s;max-width:90vw;text-align:center;
   }
   .toast.mostrar{opacity:1;}
 
@@ -262,6 +323,9 @@
     <button class="btn-secundario" onclick="abrirResumo()">
       <span>📤 Enviar resumo por WhatsApp</span><span class="seta">›</span>
     </button>
+    <button class="btn-secundario" onclick="abrirTela('telaAjustes')">
+      <span>⚙️ Ajustes e backup</span><span class="seta">›</span>
+    </button>
   </div>
 </div>
 
@@ -273,6 +337,17 @@
   </div>
   <div class="tela-corpo">
     <div class="chips" id="chipsCategoria"></div>
+
+    <div class="form-cat" id="formCategoria">
+      <div class="linha">
+        <input type="text" class="emoji" id="emojiCategoria" maxlength="4" placeholder="🌻" aria-label="Emoji da categoria">
+        <input type="text" id="nomeCategoria" maxlength="30" placeholder="Nome da categoria (ex: Venda de banana)" aria-label="Nome da categoria">
+      </div>
+      <div class="botoes">
+        <button class="btn-cat-cancelar" onclick="fecharFormCategoria()">Cancelar</button>
+        <button class="btn-cat-salvar" onclick="salvarCategoria()">Salvar categoria</button>
+      </div>
+    </div>
 
     <div class="valor-caixa">
       <div class="valor-label">Valor</div>
@@ -291,6 +366,11 @@
       <button class="tecla" onclick="digitar('00')">00</button>
       <button class="tecla" onclick="digitar('0')">0</button>
       <button class="tecla apagar" onclick="apagar()">⌫</button>
+    </div>
+
+    <div class="campo">
+      <label for="dataLancamento">Data do lançamento</label>
+      <input type="date" id="dataLancamento">
     </div>
 
     <div class="campo">
@@ -342,6 +422,47 @@
   </div>
 </div>
 
+<!-- TELA: AJUSTES E BACKUP -->
+<div class="tela" id="telaAjustes">
+  <div class="tela-topo">
+    <button class="fechar" onclick="fecharTela('telaAjustes')" aria-label="Fechar">✕</button>
+    <div class="tela-titulo">Ajustes e backup</div>
+  </div>
+  <div class="tela-corpo">
+
+    <div class="secao-ajustes">
+      <h3>Resumo por WhatsApp</h3>
+      <div class="campo">
+        <label for="numeroWhatsapp">Enviar sempre para (opcional)</label>
+        <input type="tel" id="numeroWhatsapp" inputmode="tel" placeholder="Ex: 55 24 99999 8888"
+          style="width:100%;border:1.5px solid var(--linha);border-radius:12px;padding:14px;font-size:1em;background:var(--bg-card);color:var(--ink);">
+      </div>
+      <div class="nota">Com o número salvo, o resumo abre direto na conversa da pessoa (consultoria, cooperativa ou banco). Deixe vazio para escolher o contato na hora.</div>
+    </div>
+
+    <div class="secao-ajustes">
+      <h3>Cópia de segurança</h3>
+      <button class="btn-ajuste" onclick="exportarBackup()">
+        <span>💾 Salvar cópia de segurança</span><span class="seta">›</span>
+      </button>
+      <button class="btn-ajuste" onclick="document.getElementById('arquivoRestaurar').click()">
+        <span>📥 Restaurar de uma cópia</span><span class="seta">›</span>
+      </button>
+      <input type="file" id="arquivoRestaurar" accept="application/json,.json" style="display:none" onchange="restaurarBackup(this)">
+      <div class="nota">Se o celular for trocado ou perdido, os lançamentos se perdem. Salve uma cópia de tempos em tempos e guarde no drive ou envie para você mesma pelo WhatsApp.</div>
+    </div>
+
+    <div class="secao-ajustes">
+      <h3>Planilha (Excel / banco / cooperativa)</h3>
+      <button class="btn-ajuste" onclick="exportarCsv()">
+        <span>📄 Baixar planilha de lançamentos</span><span class="seta">›</span>
+      </button>
+      <div class="nota">Gera um arquivo que abre no Excel com data, tipo, categoria, valor e observação de cada lançamento — pronto para prestação de contas.</div>
+    </div>
+
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -349,6 +470,8 @@
 const CHAVE_DADOS = 'cfr_lancamentos_v1';
 const CHAVE_NOME = 'cfr_propriedade_v1';
 const CHAVE_FONTE = 'cfr_fonte_v1';
+const CHAVE_CATS = 'cfr_categorias_v1';
+const CHAVE_ZAP = 'cfr_zap_v1';
 
 const CATEGORIAS = {
   entrada: [
@@ -372,6 +495,7 @@ let categoriaSelecionada = null;
 let valorCentavos = 0;
 let reconhecimento = null;
 let gravandoVoz = false;
+let editandoId = null;
 
 function carregar(){
   try{ return JSON.parse(localStorage.getItem(CHAVE_DADOS)) || []; }
@@ -382,8 +506,29 @@ function salvar(lista){
   catch(e){ mostrarToast('Não consegui salvar neste aparelho'); return false; }
 }
 
+function carregarCategorias(){
+  try{
+    const cats = JSON.parse(localStorage.getItem(CHAVE_CATS));
+    if(cats && Array.isArray(cats.entrada) && Array.isArray(cats.saida)) return cats;
+  }catch(e){}
+  return {entrada:[], saida:[]};
+}
+function salvarCategorias(cats){
+  try{ localStorage.setItem(CHAVE_CATS, JSON.stringify(cats)); }catch(e){}
+}
+
 function formatarMoeda(centavos){
   return (centavos/100).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+}
+
+function hojeLocal(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function dataLocalDe(iso){
+  const d = new Date(iso);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
 /* ---------- Inicialização ---------- */
@@ -398,6 +543,15 @@ window.addEventListener('DOMContentLoaded', () => {
   if(fonteSalva) document.documentElement.style.setProperty('--fs', fonteSalva);
   document.getElementById('fonteMais').addEventListener('click', ()=>ajustarFonte(1));
   document.getElementById('fonteMenos').addEventListener('click', ()=>ajustarFonte(-1));
+
+  const zapSalvo = localStorage.getItem(CHAVE_ZAP);
+  if(zapSalvo) document.getElementById('numeroWhatsapp').value = zapSalvo;
+  document.getElementById('numeroWhatsapp').addEventListener('change', e=>{
+    localStorage.setItem(CHAVE_ZAP, e.target.value);
+    mostrarToast('Número salvo ✓');
+  });
+
+  document.getElementById('dataLancamento').value = hojeLocal();
 
   atualizarSaldo();
   configurarVoz();
@@ -436,28 +590,102 @@ function atualizarSaldo(){
 /* ---------- Tela de lançamento ---------- */
 function abrirLancamento(tipo){
   tipoAtual = tipo;
+  editandoId = null;
+  prepararTelaLancamento();
+  document.getElementById('tituloLancamento').textContent = tipo === 'entrada' ? 'Entrou dinheiro' : 'Saiu dinheiro';
+  document.getElementById('btnSalvarLancamento').textContent = 'Salvar lançamento';
+  abrirTela('telaLancamento');
+}
+
+function prepararTelaLancamento(){
   categoriaSelecionada = null;
   valorCentavos = 0;
   document.getElementById('obsLancamento').value = '';
   document.getElementById('valorNumero').textContent = 'R$ 0,00';
-  document.getElementById('tituloLancamento').textContent = tipo === 'entrada' ? 'Entrou dinheiro' : 'Saiu dinheiro';
+  document.getElementById('dataLancamento').value = hojeLocal();
+  renderChips();
+  validarSalvar();
+}
 
-  const cor = tipo === 'entrada' ? 'var(--verde)' : 'var(--terra)';
-  const bg = tipo === 'entrada' ? '#EAF3EA' : '#F7E9E4';
+function renderChips(){
+  const cor = tipoAtual === 'entrada' ? 'var(--verde)' : 'var(--terra)';
+  const bg = tipoAtual === 'entrada' ? '#EAF3EA' : '#F7E9E4';
   const wrap = document.getElementById('chipsCategoria');
   wrap.innerHTML = '';
-  CATEGORIAS[tipo].forEach(cat => {
+  fecharFormCategoria();
+
+  const custom = carregarCategorias()[tipoAtual];
+  const todas = CATEGORIAS[tipoAtual].concat(custom);
+
+  todas.forEach(cat => {
+    const item = document.createElement('div');
+    item.className = 'chip-item';
+
     const btn = document.createElement('button');
     btn.className = 'chip';
     btn.style.setProperty('--sel-cor', cor);
     btn.style.setProperty('--sel-bg', bg);
-    btn.innerHTML = `<span class="icone">${cat.icone}</span><span>${cat.rotulo}</span>`;
+    btn.dataset.catId = cat.id;
+    btn.innerHTML = `<span class="icone">${cat.icone}</span><span>${escaparHtml(cat.rotulo)}</span>`;
     btn.onclick = () => selecionarCategoria(cat.id, btn);
-    wrap.appendChild(btn);
+
+    const remover = document.createElement('button');
+    remover.className = 'remover-cat';
+    remover.textContent = '✕';
+    remover.setAttribute('aria-label', 'Remover categoria ' + cat.rotulo);
+    remover.onclick = (e) => {
+      e.stopPropagation();
+      if(confirm(`Remover a categoria "${cat.rotulo}"? Os lançamentos feitos nela não serão apagados.`)){
+        removerCategoria(cat.id);
+      }
+    };
+
+    item.appendChild(btn);
+    item.appendChild(remover);
+    wrap.appendChild(item);
   });
 
-  validarSalvar();
-  abrirTela('telaLancamento');
+  const novo = document.createElement('button');
+  novo.className = 'chip chip-novo';
+  novo.innerHTML = '<span class="icone">➕</span><span>Nova categoria</span>';
+  novo.onclick = abrirFormCategoria;
+  wrap.appendChild(novo);
+}
+
+function abrirFormCategoria(){
+  document.getElementById('formCategoria').classList.add('mostrar');
+  document.getElementById('emojiCategoria').value = '';
+  document.getElementById('nomeCategoria').value = '';
+  document.getElementById('emojiCategoria').focus();
+}
+function fecharFormCategoria(){
+  document.getElementById('formCategoria').classList.remove('mostrar');
+}
+
+function salvarCategoria(){
+  const emoji = document.getElementById('emojiCategoria').value.trim() || '📌';
+  const nome = document.getElementById('nomeCategoria').value.trim();
+  if(!nome){
+    mostrarToast('Digite o nome da categoria');
+    return;
+  }
+  const cats = carregarCategorias();
+  const id = 'custom_' + tipoAtual + '_' + Date.now().toString(36);
+  cats[tipoAtual].push({id, icone: emoji, rotulo: nome});
+  salvarCategorias(cats);
+  renderChips();
+  mostrarToast('Categoria criada ✓');
+}
+
+function removerCategoria(id){
+  const cats = carregarCategorias();
+  cats[tipoAtual] = cats[tipoAtual].filter(c => c.id !== id);
+  salvarCategorias(cats);
+  if(categoriaSelecionada === id){
+    categoriaSelecionada = null;
+    validarSalvar();
+  }
+  renderChips();
 }
 
 function selecionarCategoria(id, elemento){
@@ -484,24 +712,78 @@ function validarSalvar(){
   document.getElementById('btnSalvarLancamento').disabled = !(categoriaSelecionada && valorCentavos > 0);
 }
 
+function descricaoCategoria(id){
+  const custom = carregarCategorias()[tipoAtual];
+  const cat = CATEGORIAS[tipoAtual].concat(custom).find(c => c.id === id);
+  return cat || {rotulo:'Outro', icone:'•'};
+}
+
 function salvarLancamento(){
   const lista = carregar();
-  const catObj = CATEGORIAS[tipoAtual].find(c => c.id === categoriaSelecionada);
+  const catObj = descricaoCategoria(categoriaSelecionada);
+  const dataEscolhida = document.getElementById('dataLancamento').value || hojeLocal();
+  // meio-dia local evita mudança de dia por fuso horário
+  const dataISO = new Date(dataEscolhida + 'T12:00:00').toISOString();
+
+  if(editandoId){
+    const idx = lista.findIndex(l => l.id === editandoId);
+    if(idx >= 0){
+      lista[idx].tipo = tipoAtual;
+      lista[idx].categoria = categoriaSelecionada;
+      lista[idx].categoriaRotulo = catObj.rotulo;
+      lista[idx].categoriaIcone = catObj.icone;
+      lista[idx].valor = valorCentavos;
+      lista[idx].obs = document.getElementById('obsLancamento').value.trim();
+      lista[idx].data = dataISO;
+    }
+    salvar(lista);
+    atualizarSaldo();
+    pararVoz();
+    fecharTela('telaLancamento');
+    mostrarToast('Lançamento atualizado ✓');
+    return;
+  }
+
   lista.push({
     id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
     tipo: tipoAtual,
     categoria: categoriaSelecionada,
-    categoriaRotulo: catObj ? catObj.rotulo : 'Outro',
-    categoriaIcone: catObj ? catObj.icone : '•',
+    categoriaRotulo: catObj.rotulo,
+    categoriaIcone: catObj.icone,
     valor: valorCentavos,
     obs: document.getElementById('obsLancamento').value.trim(),
-    data: new Date().toISOString()
+    data: dataISO
   });
   salvar(lista);
   atualizarSaldo();
   pararVoz();
   fecharTela('telaLancamento');
   mostrarToast('Lançamento salvo ✓');
+}
+
+/* ---------- Edição ---------- */
+function abrirEdicao(id){
+  const lanc = carregar().find(l => l.id === id);
+  if(!lanc) return;
+
+  tipoAtual = lanc.tipo;
+  editandoId = id;
+  categoriaSelecionada = lanc.categoria;
+  valorCentavos = lanc.valor;
+
+  document.getElementById('tituloLancamento').textContent = 'Corrigir lançamento';
+  document.getElementById('btnSalvarLancamento').textContent = 'Salvar correção';
+  document.getElementById('obsLancamento').value = lanc.obs || '';
+  document.getElementById('valorNumero').textContent = formatarMoeda(valorCentavos);
+  document.getElementById('dataLancamento').value = dataLocalDe(lanc.data);
+
+  renderChips();
+  const chip = document.querySelector(`#chipsCategoria .chip[data-cat-id="${CSS.escape(lanc.categoria)}"]`);
+  if(chip) chip.classList.add('selecionado');
+  else categoriaSelecionada = null;
+
+  validarSalvar();
+  abrirTela('telaLancamento');
 }
 
 /* ---------- Voz (opcional, com verificação de suporte) ---------- */
@@ -545,6 +827,9 @@ function pararVoz(){
   gravandoVoz = false;
   const btn = document.getElementById('btnMic');
   if(btn) btn.classList.remove('gravando');
+  if(reconhecimento && gravandoVoz){
+    try{ reconhecimento.stop(); }catch(e){}
+  }
 }
 
 /* ---------- Histórico ---------- */
@@ -592,20 +877,26 @@ function filtrarHistorico(periodo, botao){
     grupoDiv.className = 'dia-grupo';
     grupoDiv.innerHTML = `<div class="dia-titulo">${chave}</div>`;
     grupos[chave].forEach(l => {
-      const item = document.createElement('div');
+      const item = document.createElement('button');
       item.className = 'item';
       const sinal = l.tipo === 'entrada' ? '+' : '-';
       const classeVal = l.tipo === 'entrada' ? 'pos' : 'neg';
       item.innerHTML = `
         <div class="icone">${l.categoriaIcone}</div>
         <div class="info">
-          <div class="cat">${l.categoriaRotulo}</div>
+          <div class="cat">${escaparHtml(l.categoriaRotulo)}</div>
           ${l.obs ? `<div class="obs">${escaparHtml(l.obs)}</div>` : ''}
         </div>
         <div class="val ${classeVal}">${sinal} ${formatarMoeda(l.valor)}</div>
-        <button class="excluir" aria-label="Excluir">🗑️</button>
+        <span class="excluir" role="button" aria-label="Excluir">🗑️</span>
       `;
-      item.querySelector('.excluir').onclick = () => excluirLancamento(l.id, periodo, botao);
+      item.onclick = (e) => {
+        if(e.target.closest('.excluir')){
+          excluirLancamento(l.id, periodo, botao);
+          return;
+        }
+        abrirEdicao(l.id);
+      };
       grupoDiv.appendChild(item);
     });
     container.appendChild(grupoDiv);
@@ -667,8 +958,90 @@ function montarResumo(periodo, botao){
 
 function enviarWhatsapp(){
   const texto = document.getElementById('textoResumo').textContent;
-  const url = 'https://wa.me/?text=' + encodeURIComponent(texto);
+  const numeroSalvo = (localStorage.getItem(CHAVE_ZAP) || '').replace(/\D/g, '');
+  const destino = numeroSalvo.length >= 10 ? numeroSalvo : '';
+  const url = 'https://wa.me/' + destino + '?text=' + encodeURIComponent(texto);
   window.open(url, '_blank');
+}
+
+/* ---------- Backup / Restauração / CSV ---------- */
+function baixarArquivo(nome, conteudo, tipo){
+  const blob = new Blob([conteudo], {type: tipo});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(()=> URL.revokeObjectURL(url), 5000);
+}
+
+function exportarBackup(){
+  const dados = {
+    app: 'meu-dinheiro-na-roca',
+    versao: 1,
+    exportadoEm: new Date().toISOString(),
+    propriedade: document.getElementById('nomePropriedade').value,
+    lancamentos: carregar(),
+    categorias: carregarCategorias()
+  };
+  baixarArquivo('dinheiro-na-roca-copia-' + hojeLocal() + '.json', JSON.stringify(dados, null, 2), 'application/json');
+  mostrarToast('Cópia gerada ✓');
+}
+
+function restaurarBackup(input){
+  const arquivo = input.files && input.files[0];
+  input.value = '';
+  if(!arquivo) return;
+
+  const leitor = new FileReader();
+  leitor.onload = () => {
+    try{
+      const dados = JSON.parse(leitor.result);
+      const lista = Array.isArray(dados) ? dados : dados.lancamentos;
+      if(!Array.isArray(lista)) throw new Error('formato inválido');
+
+      const validos = lista.filter(l =>
+        l && typeof l.valor === 'number' && typeof l.data === 'string' &&
+        (l.tipo === 'entrada' || l.tipo === 'saida')
+      );
+
+      if(!confirm(`Esta cópia tem ${validos.length} lançamentos. Restaurar e substituir os lançamentos deste aparelho?`)) return;
+
+      salvar(validos);
+      if(dados.categorias && Array.isArray(dados.categorias.entrada) && Array.isArray(dados.categorias.saida)){
+        salvarCategorias(dados.categorias);
+      }
+      if(dados.propriedade){
+        document.getElementById('nomePropriedade').value = dados.propriedade;
+        localStorage.setItem(CHAVE_NOME, dados.propriedade);
+      }
+      atualizarSaldo();
+      mostrarToast(`Restaurados ${validos.length} lançamentos ✓`);
+    }catch(e){
+      alert('Não consegui ler essa cópia. Confira se é o arquivo certo.');
+    }
+  };
+  leitor.readAsText(arquivo);
+}
+
+function exportarCsv(){
+  const lista = carregar().sort((a,b)=> new Date(a.data)-new Date(b.data));
+  if(lista.length === 0){
+    mostrarToast('Nenhum lançamento para exportar');
+    return;
+  }
+  let csv = '\ufeffData;Tipo;Categoria;Valor (R$);Observação\n';
+  lista.forEach(l => {
+    const data = dataLocalDe(l.data).split('-').reverse().join('/');
+    const tipo = l.tipo === 'entrada' ? 'Entrada' : 'Saída';
+    const valor = (l.valor/100).toFixed(2).replace('.', ',');
+    const obs = (l.obs || '').replace(/;/g, ',').replace(/\n/g, ' ');
+    csv += `${data};${tipo};${l.categoriaRotulo};${valor};${obs}\n`;
+  });
+  baixarArquivo('lancamentos-' + hojeLocal() + '.csv', csv, 'text/csv;charset=utf-8');
+  mostrarToast('Planilha gerada ✓');
 }
 
 /* ---------- Navegação de telas ---------- */

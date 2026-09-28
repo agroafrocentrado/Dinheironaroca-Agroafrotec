@@ -1,9 +1,11 @@
-const CACHE_NAME = 'dinheiro-roca-v2';
+const CACHE_NAME = 'dinheiro-roca-v3';
 
 const PRECACHE_URLS = [
   './',
   './index.html',
-  './manifest.webmanifest'
+  './manifest.webmanifest',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
